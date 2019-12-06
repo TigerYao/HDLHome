@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">HDLHome</string>
     <string name="title_item_detail">Item Detail</string>
+    <string-array name="settings">
+        <item>配置</item>
+        <item>系统设置</item>
+    </string-array>
 </resources>

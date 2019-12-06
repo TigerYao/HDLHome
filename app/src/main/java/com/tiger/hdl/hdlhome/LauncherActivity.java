@@ -1,115 +1,137 @@
 package com.tiger.hdl.hdlhome;
 
-import android.content.Context;
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.provider.Settings;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tiger.hdl.hdlhome.dummy.DummyContent;
+import com.tiger.hdl.hdlhome.dummy.DummyItem;
+import com.tiger.hdl.hdlhome.utils.FileUtils;
+import com.tiger.hdl.hdlhome.utils.net.RxSocket;
 
 import java.util.List;
 
-import static android.widget.GridLayout.HORIZONTAL;
-import static android.widget.GridLayout.VERTICAL;
-
 public class LauncherActivity extends AppCompatActivity {
+    View recyclerView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_list);
-        View recyclerView = findViewById(R.id.item_list);
+        recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+//        RxSocket.getInstance().setResultListener(new RxSocket.SocketListener<List<DummyItem>>() {
+//            @Override
+//            public void cancleListen() {
+//
+//            }
+//
+//            @Override
+//            public void accept(List<DummyItem> dummyItems) throws Exception {
+//                setupRecyclerView((RecyclerView) recyclerView, dummyItems);
+//            }
+//        });
+        startService(new Intent(this, MyService.class));
+        RxSocket.getInstance().setResultListener(new RxSocket.SocketListener() {
+            @Override
+            public void cancleListen() {
+
+            }
+
+            @Override
+            public void accept(Object o) throws Exception {
+
+            }
+        });
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<DummyItem> items) {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 20);
         recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(LauncherActivity.this, VERTICAL));
-//        recyclerView.addItemDecoration(new GridDividerItemDecoration(LauncherActivity.this, 1, 10,true, true));
-        recyclerView.setAdapter(new LauncherActivity.SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, false));
+        recyclerView.addItemDecoration(new GridDividerItemDecoration(10, getResources().getColor(R.color.gray_666666)));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, items));
     }
 
-    public static class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<LauncherActivity.SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final LauncherActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
-        private final boolean mTwoPane;
-        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
-                } else {
-                    Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+    @Override
+    public void onBackPressed() {
+        showDialog();
+    }
 
-                    context.startActivity(intent);
+    AlertDialog mSettingDialog;
+
+    private void showDialog() {
+        if (mSettingDialog == null)
+            mSettingDialog = new AlertDialog.Builder(this, R.style.CustomDialog).setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.settings)), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    switch (i) {
+                        case 0:
+                            if(checkPermission()) {
+                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+                                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                startActivityForResult(intent, 1);
+                            }
+                            break;
+                        case 1:
+                            Intent intents = new Intent(Settings.ACTION_SETTINGS);
+                            startActivity(intents);
+                            break;
+                    }
                 }
-            }
-        };
+            }).setTitle("设置").create();
+        mSettingDialog.show();
+    }
 
-        SimpleItemRecyclerViewAdapter(LauncherActivity parent,
-                                      List<DummyContent.DummyItem> items,
-                                      boolean twoPane) {
-            mValues = items;
-            mParentActivity = parent;
-            mTwoPane = twoPane;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            String path = FileUtils.getPath(this, data.getData());
+            RxSocket.getInstance().cancleAll(true);
+            RxSocket.getInstance().connectSocket(path);
         }
+    }
 
-        @Override
-        public SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_list_content, parent, false);
-            return new SimpleItemRecyclerViewAdapter.ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final LauncherActivity.SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
-//            holder.mIdView.setText(mValues.get(position).id);
-            if(!mValues.get(position).content.contains("4") && !mValues.get(position).content.contains("7")) {
-                holder.mContentView.setText(mValues.get(position).content);
-                holder.itemView.setTag(mValues.get(position));
-                holder.itemView.setOnClickListener(mOnClickListener);
-            }
-            if(position > 0 && position %3 == 0)
-                holder.itemView.setBackgroundColor(Color.BLUE);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-            final TextView mContentView;
-
-            ViewHolder(View view) {
-                super(view);
-                mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            if(requestCode == 1001){
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent, 1);
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RxSocket.getInstance().cancleAll(true);
+    }
+
+    private boolean checkPermission() {
+        int checkSelfPermissionWrite = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (checkSelfPermissionWrite == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE}, 1001);
+        return false;
     }
 }
