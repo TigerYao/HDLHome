@@ -1,8 +1,21 @@
 package com.tiger.hdl.hdlhome.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
+import android.text.TextUtils;
+import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 /**
  * Created by saiyuan on 2016/10/26.
@@ -78,7 +91,7 @@ public class DisplayUtil {
         return (int) (pxValue * getScaledDensity(ctx) + 0.5f);
     }
 
-    public static int px2sp(float pxValue,Context ctx) {
+    public static int px2sp(float pxValue, Context ctx) {
         return (int) (pxValue / getScaledDensity(ctx) + 0.5f);
     }
 
@@ -96,15 +109,61 @@ public class DisplayUtil {
         }
         return navigationBarHeight;
     }
-
+    static String strMacAddr = null;
+    public static String getMacAddress() {
+        if(!TextUtils.isEmpty(strMacAddr))
+            return strMacAddr;
+        try {
+            // 获得IpD地址
+            InetAddress ip = getLocalInetAddress();
+            byte[] b = NetworkInterface.getByInetAddress(ip)
+                    .getHardwareAddress();
+            StringBuffer buffer = new StringBuffer();
+            for (int i = 0; i < b.length; i++) {
+                if (i != 0) {
+                    buffer.append(':');
+                }
+                String str = Integer.toHexString(b[i] & 0xFF);
+                buffer.append(str.length() == 1 ? 0 + str : str);
+            }
+            strMacAddr = buffer.toString().toUpperCase();
+        } catch (Exception e) {
+        }
+        return strMacAddr;
+    }
     /**
-     * 判断当前设备是手机还是平板，代码来自 Google I/O App for Android
-     * @param context
-     * @return 平板返回 True，手机返回 False
+     * 获取移动设备本地IP
+     *
+     * @return
      */
-  /*  public static boolean isPad(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }*/
+    private static InetAddress getLocalInetAddress() {
+        InetAddress ip = null;
+        try {
+            // 列举
+            Enumeration<NetworkInterface> en_netInterface = NetworkInterface
+                    .getNetworkInterfaces();
+            while (en_netInterface.hasMoreElements()) {// 是否还有元素
+                NetworkInterface ni = (NetworkInterface) en_netInterface
+                        .nextElement();// 得到下一个元素
+                Enumeration<InetAddress> en_ip = ni.getInetAddresses();// 得到一个ip地址的列举
+                while (en_ip.hasMoreElements()) {
+                    ip = en_ip.nextElement();
+                    if (!ip.isLoopbackAddress()
+                            && ip.getHostAddress().indexOf(":") == -1)
+                        break;
+                    else
+                        ip = null;
+                }
+
+                if (ip != null) {
+                    break;
+                }
+            }
+        } catch (SocketException e) {
+
+            e.printStackTrace();
+        }
+        return ip;
+    }
+
 }

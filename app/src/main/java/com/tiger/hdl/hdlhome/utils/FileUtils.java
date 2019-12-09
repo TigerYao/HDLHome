@@ -15,9 +15,12 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public class FileUtils {
@@ -269,5 +272,65 @@ public class FileUtils {
         }
         mCacheDirPath = cacheDirPath;
         return cacheDirPath;
+    }
+
+    public static String readAssTextFile(Context ctx, String filePath){
+        String feedType = null;
+        //StringBuffer初始化
+        StringBuffer feedTypeStringBuffer=new StringBuffer();
+//        feedTypeStringBuffer.append("");
+        String lineTxt = null;
+//        File file = new File(filePath);
+        //文件读写会产生异常所以要放在try catch中
+        try{
+            //判断文件存在
+//            if(file.isFile()&&file.exists()){
+                Log.e("SocketClientUtil","存在");
+                //读取字节流 utf-8是字符编码方式 可以根据具体情况进行更改
+                InputStreamReader read = new InputStreamReader(ctx.getAssets().open("config.txt"));
+                BufferedReader bufferedReader = new BufferedReader(read);
+
+                while ((lineTxt = bufferedReader.readLine())!=null){
+                    feedTypeStringBuffer.append(lineTxt);
+                    Log.e("读取的数据：",feedTypeStringBuffer.toString());
+                }
+                //通过split转换成list返回
+                feedType = feedTypeStringBuffer.toString();
+                read.close();
+//            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return feedType;
+    }
+
+    public static String readTextFile(String filePath){
+        String feedType = null;
+        //StringBuffer初始化
+        StringBuffer feedTypeStringBuffer=new StringBuffer();
+//        feedTypeStringBuffer.append("");
+        String lineTxt = null;
+        File file = new File(filePath);
+        //文件读写会产生异常所以要放在try catch中
+        try{
+            //判断文件存在
+            if(file.isFile()&&file.exists()){
+                Log.e("文件","存在");
+                //读取字节流 utf-8是字符编码方式 可以根据具体情况进行更改
+                InputStreamReader read = new InputStreamReader(new FileInputStream(file),"utf-8");
+                BufferedReader bufferedReader = new BufferedReader(read);
+
+                while ((lineTxt = bufferedReader.readLine())!=null){
+                    feedTypeStringBuffer.append(lineTxt);
+                    Log.e("读取的数据：",feedTypeStringBuffer.toString());
+                }
+                //通过split转换成list返回
+                feedType = feedTypeStringBuffer.toString();
+                read.close();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return feedType;
     }
 }

@@ -14,54 +14,59 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tiger.hdl.hdlhome.dummy.DeskInfo;
 import com.tiger.hdl.hdlhome.dummy.DummyItem;
+import com.tiger.hdl.hdlhome.utils.DisplayUtil;
 import com.tiger.hdl.hdlhome.utils.FileUtils;
-import com.tiger.hdl.hdlhome.utils.net.RxSocket;
+import com.tiger.hdl.hdlhome.utils.net.SocketClientUtil;
 
 import java.util.List;
 
-public class LauncherActivity extends AppCompatActivity {
-    View recyclerView;
+import static androidx.recyclerview.widget.RecyclerView.HORIZONTAL;
+import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
+public class LauncherActivity extends AppCompatActivity {
+    RecyclerView recyclerView;
+    SimpleItemRecyclerViewAdapter mAdapter;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_list);
         recyclerView = findViewById(R.id.item_list);
-        assert recyclerView != null;
-//        RxSocket.getInstance().setResultListener(new RxSocket.SocketListener<List<DummyItem>>() {
-//            @Override
-//            public void cancleListen() {
-//
-//            }
-//
-//            @Override
-//            public void accept(List<DummyItem> dummyItems) throws Exception {
-//                setupRecyclerView((RecyclerView) recyclerView, dummyItems);
-//            }
-//        });
-        startService(new Intent(this, MyService.class));
-        RxSocket.getInstance().setResultListener(new RxSocket.SocketListener() {
+//        DisplayUtil.getMacAddress();
+//        assert recyclerView != null;
+        SocketClientUtil.getInstance().setCtx(this);
+        SocketClientUtil.getInstance().openConfig("file:///android_asset/config.txt");
+        SocketClientUtil.getInstance().setClientListener(new SocketClientUtil.OnMsgListener() {
             @Override
-            public void cancleListen() {
+            public void onReceived(DeskInfo deskInfo) {
+                setupRecyclerView(recyclerView, deskInfo.data);
+            }
+
+            @Override
+            public void onConnected() {
 
             }
 
             @Override
-            public void accept(Object o) throws Exception {
+            public void onDisconnect() {
 
             }
         });
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<DummyItem> items) {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 20);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.addItemDecoration(new GridDividerItemDecoration(10, getResources().getColor(R.color.gray_666666)));
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, items));
+        if(mAdapter == null) {
+            mAdapter = new SimpleItemRecyclerViewAdapter(this, items);
+            StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(20, VERTICAL);
+            recyclerView.setLayoutManager(gridLayoutManager);
+            recyclerView.addItemDecoration(new GridDividerItemDecoration(10, getResources().getColor(R.color.gray_666666)));
+            recyclerView.setAdapter(mAdapter);
+        }else
+            mAdapter.setValues(items);
     }
 
 
@@ -101,8 +106,7 @@ public class LauncherActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String path = FileUtils.getPath(this, data.getData());
-            RxSocket.getInstance().cancleAll(true);
-            RxSocket.getInstance().connectSocket(path);
+
         }
     }
 
@@ -120,9 +124,14 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
+        SocketClientUtil.getInstance().disConnect();
         super.onDestroy();
-        RxSocket.getInstance().cancleAll(true);
     }
 
     private boolean checkPermission() {

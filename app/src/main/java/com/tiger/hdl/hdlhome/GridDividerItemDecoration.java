@@ -44,27 +44,38 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
 //            mDividerWidth += mDividerWidth;
 //        else
 //            mDividerWidth = 10;
+        int gap = 0;
+        //画垂直分割线
+        if(itemPosition > 0 && (itemPosition / 10) % 2 == 1 && String.valueOf(itemPosition-1).endsWith("9")){
+            mPaint.setColor(Color.parseColor("#42a0e1"));
+            gap = - 20;
 
+        }
         int left;
         int right;
         int bottom;
-        int eachWidth = (spanCount - 1) * mDividerWidth / spanCount;
+        int eachWidth = (spanCount - 1) * mDividerWidth * 2 / spanCount;
         int dl = mDividerWidth - eachWidth;
-        left = itemPosition % spanCount * dl;
+        left = itemPosition % spanCount * dl + gap;
         right = eachWidth - left;
         bottom = mDividerWidth;
         //Log.e("zzz", "itemPosition:" + itemPosition + " |left:" + left + " right:" + right + " bottom:" + bottom);
         if (isLastRow) {
             bottom = 0;
         }
+//        if(itemPosition > 0 && String.valueOf(itemPosition).endsWith("4")){
+//            outRect.left = left;
+//            outRect.right = eachWidth;
+//            return;
+//        }
         outRect.set(left, 0, right, bottom);
 
     }
 
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        super.onDraw(c, parent, state);
         draw(c, parent);
+        super.onDraw(c, parent, state);
     }
 
     //绘制横向 item 分割线
@@ -84,10 +95,18 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
                 canvas.drawRect(left, top, right, bottom, mPaint);
             }
 
-            //画垂直分割线
+            int gap = 0;
+//            //画垂直分割线
+            if(i > 0 && (i / 10) % 2 == 1 && String.valueOf(i-1).endsWith("9")){
+                mPaint.setColor(Color.parseColor("#42a0e1"));
+                gap = 200;
+            }
+            if(i > 0 && String.valueOf(i).endsWith("4")){
+                mPaint.setColor(Color.parseColor("#42a0e1"));
+            }
             top = child.getTop();
             bottom = child.getBottom() + mDividerWidth;
-            left = child.getRight() + layoutParams.rightMargin;
+            left = child.getRight() + layoutParams.rightMargin + gap;
             right = left + mDividerWidth;
             if (mPaint != null) {
                 canvas.drawRect(left, top, right, bottom, mPaint);
