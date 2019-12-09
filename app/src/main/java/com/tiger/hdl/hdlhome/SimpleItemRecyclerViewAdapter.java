@@ -19,6 +19,8 @@ public class SimpleItemRecyclerViewAdapter
     private final LauncherActivity mParentActivity;
     private List<DummyItem> mValues;
     int realIndex = 0;
+    int realWidh = 0;
+    int realHeight = 0;
 
     SimpleItemRecyclerViewAdapter(LauncherActivity parent,
                                   List<DummyItem> items) {
@@ -37,23 +39,23 @@ public class SimpleItemRecyclerViewAdapter
     public SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_list_content, parent, false);
-        view.getLayoutParams().height = ((int) Math.floor((DisplayUtil.getScreenHeight(view.getContext()) - 11) / 11));
-        view.getLayoutParams().width = ((int) Math.floor((DisplayUtil.getScreenWidth(view.getContext()) -20) / 20f));
+        if(realWidh == 0) {
+            realWidh = (int) Math.floor((DisplayUtil.getScreenWidth(view.getContext())) / 20f);
+            realWidh = (int) Math.floor((DisplayUtil.getScreenWidth(view.getContext()) + realWidh) / 20f);
+            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(view.getContext())) / 11)) - 5;
+        }
+        view.getLayoutParams().height = realHeight;
+        view.getLayoutParams().width = realWidh;
         if (viewType == 1)
-            view.getLayoutParams().width /= 2;
-//        else if (viewType == 2)
-//            view.getLayoutParams().width /= 4;
+            view.getLayoutParams().width = realWidh/2;
         return new SimpleItemRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
     public int getItemViewType(int position) {
         String value = String.valueOf(position);
-        if (position != 0 && (value.contains("4") || value.contains("7")))
+        if (position != 0 && (value.endsWith("4") || value.endsWith("7")))
             return 1;
-        if (position > 0 && (position / 10) % 2 == 1 && String.valueOf(position - 1).endsWith("9")) {
-            return 2;
-        }
         return 0;
     }
 
@@ -64,7 +66,7 @@ public class SimpleItemRecyclerViewAdapter
             if (mValues != null && realIndex < mValues.size()) {
                 DummyItem dummyItem = mValues.get(realIndex);
                 realIndex += 1;
-                holder.mContentView.setText(dummyItem.did);
+                holder.mContentView.setText(value);
                 int color = dummyItem.status == 2 ? Color.RED
                         : dummyItem.status == 0 ? Color.GREEN
                         : dummyItem.status == 3 ? Color.YELLOW

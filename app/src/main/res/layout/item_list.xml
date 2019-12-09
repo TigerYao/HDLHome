@@ -3,5 +3,8 @@
     android:id="@+id/item_list"
     android:name="com.tiger.hdl.hdlhome.ItemListFragment"
     android:layout_width="match_parent"
-    android:background="@color/gray_666666"
+    android:background="#42a0e1"
+    android:paddingTop="5dp"
+    android:paddingLeft="1dp"
+    android:paddingBottom="5dp"
     android:layout_height="match_parent" />

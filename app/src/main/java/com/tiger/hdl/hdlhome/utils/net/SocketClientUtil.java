@@ -47,7 +47,7 @@ public class SocketClientUtil {
     }
 
     public void setCtx(Context ctx) {
-        this.mCtx = ctx;//.getApplicationContext();
+        this.mCtx = ctx;
     }
 
     public void setClientListener(OnMsgListener clientListener) {
@@ -60,14 +60,16 @@ public class SocketClientUtil {
             @Override
             public ConfigMode apply(String s) throws Exception {
                 Log.i(TAG, "apply..." + s);
-                File feedTypeFile = new File(s);
                 ConfigMode configMode = new ConfigMode();
-//                if(feedTypeFile.exists() && feedTypeFile.length() > 0){
+                String str = null;
+                if (s.contains("android_asset") && s.startsWith("file")) {
+                    str = FileUtils.readAssTextFile(mCtx, s);
+                    configMode = new Gson().fromJson(str, ConfigMode.class);
+                } else {
+                    str = FileUtils.readTextFile(s);
+                    configMode = new Gson().fromJson(str, ConfigMode.class);
+                }
 
-                String str = FileUtils.readAssTextFile(mCtx, s);
-                Log.i(TAG, "apply..." + str);
-                configMode = new Gson().fromJson(str, ConfigMode.class);
-//                }
                 return configMode;
             }
         }).map(new Function<ConfigMode, ServiceIpEntity>() {
@@ -186,27 +188,27 @@ public class SocketClientUtil {
 
         @Override
         public void onReceive(XTcpClient client, TcpMsg tcpMsg) {
-          Observable.just(tcpMsg).filter(new Predicate<TcpMsg>() {
-              @Override
-              public boolean test(TcpMsg tcpMsg) throws Exception {
-                  return (tcpMsg != null && !TextUtils.isEmpty(tcpMsg.getSourceDataString())) ;
-              }
-          }).map(new Function<TcpMsg, String>() {
-              @Override
-              public String apply(TcpMsg tcpMsg) throws Exception {
-                  Log.i(TAG, "onReceive..." + tcpMsg.getSourceDataString());
+            Observable.just(tcpMsg).filter(new Predicate<TcpMsg>() {
+                @Override
+                public boolean test(TcpMsg tcpMsg) throws Exception {
+                    return (tcpMsg != null && !TextUtils.isEmpty(tcpMsg.getSourceDataString()));
+                }
+            }).map(new Function<TcpMsg, String>() {
+                @Override
+                public String apply(TcpMsg tcpMsg) throws Exception {
+                    Log.i(TAG, "onReceive..." + tcpMsg.getSourceDataString());
 //                  while (tcpMsg != null && !TextUtils.isEmpty(tcpMsg.getSourceDataString())) {
-                      strMsg.append(tcpMsg.getSourceDataString());
+                    strMsg.append(tcpMsg.getSourceDataString());
 //                  }
-                  return strMsg.toString();
-              }
-          }).subscribeOn(Schedulers.io()).subscribeOn(Schedulers.newThread()).subscribe(new Consumer<String>() {
-              @Override
-              public void accept(String s) throws Exception {
-                  pareseMsg(s);
-                  strMsg = new StringBuilder();
-              }
-          });
+                    return strMsg.toString();
+                }
+            }).subscribeOn(Schedulers.io()).subscribeOn(Schedulers.newThread()).subscribe(new Consumer<String>() {
+                @Override
+                public void accept(String s) throws Exception {
+                    pareseMsg(s);
+                    strMsg = new StringBuilder();
+                }
+            });
         }
 
         @Override

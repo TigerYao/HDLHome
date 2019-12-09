@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
@@ -15,19 +14,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tiger.hdl.hdlhome.dummy.DeskInfo;
 import com.tiger.hdl.hdlhome.dummy.DummyItem;
-import com.tiger.hdl.hdlhome.utils.DisplayUtil;
 import com.tiger.hdl.hdlhome.utils.FileUtils;
 import com.tiger.hdl.hdlhome.utils.net.SocketClientUtil;
 
 import java.util.List;
 
-import static androidx.recyclerview.widget.RecyclerView.HORIZONTAL;
-import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 public class LauncherActivity extends AppCompatActivity {
     RecyclerView recyclerView;
@@ -62,9 +57,10 @@ public class LauncherActivity extends AppCompatActivity {
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<DummyItem> items) {
         if(mAdapter == null) {
             mAdapter = new SimpleItemRecyclerViewAdapter(this, items);
-            StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(20, VERTICAL);
-            recyclerView.setLayoutManager(gridLayoutManager);
-            recyclerView.addItemDecoration(new GridDividerItemDecoration(8, Color.WHITE));
+//            StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(20, VERTICAL);
+            FlowLayoutManager flowLayoutManager = new FlowLayoutManager(this, true);
+            recyclerView.setLayoutManager(flowLayoutManager);
+            recyclerView.addItemDecoration(new GridDividerItemDecoration(2, Color.WHITE));
             recyclerView.setAdapter(mAdapter);
         }else
             mAdapter.setValues(items);
