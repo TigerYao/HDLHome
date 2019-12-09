@@ -46,15 +46,15 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
 //            mDividerWidth = 10;
         int gap = 0;
         //画垂直分割线
-        if(itemPosition > 0 && (itemPosition / 10) % 2 == 1 && String.valueOf(itemPosition-1).endsWith("9")){
-            mPaint.setColor(Color.parseColor("#42a0e1"));
-            gap = - 20;
-
-        }
+//        if(itemPosition > 0 && (itemPosition / 10) % 2 == 1 && String.valueOf(itemPosition-1).endsWith("9")){
+//            mPaint.setColor(Color.parseColor("#42a0e1"));
+//            gap = - 20;
+//
+//        }
         int left;
         int right;
         int bottom;
-        int eachWidth = (spanCount - 1) * mDividerWidth * 2 / spanCount;
+        int eachWidth = (spanCount - 1) * mDividerWidth / spanCount;
         int dl = mDividerWidth - eachWidth;
         left = itemPosition % spanCount * dl + gap;
         right = eachWidth - left;
@@ -97,13 +97,13 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
 
             int gap = 0;
 //            //画垂直分割线
-            if(i > 0 && (i / 10) % 2 == 1 && String.valueOf(i-1).endsWith("9")){
-                mPaint.setColor(Color.parseColor("#42a0e1"));
-                gap = 200;
-            }
-            if(i > 0 && String.valueOf(i).endsWith("4")){
-                mPaint.setColor(Color.parseColor("#42a0e1"));
-            }
+//            if(i > 0 && (i / 10) % 2 == 1 && String.valueOf(i-1).endsWith("9")){
+//                mPaint.setColor(Color.parseColor("#42a0e1"));
+//                gap = 200;
+//            }
+//            if(i > 0 && String.valueOf(i).endsWith("4")){
+//                mPaint.setColor(Color.parseColor("#42a0e1"));
+//            }
             top = child.getTop();
             bottom = child.getBottom() + mDividerWidth;
             left = child.getRight() + layoutParams.rightMargin + gap;

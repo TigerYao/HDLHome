@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -63,7 +64,7 @@ public class LauncherActivity extends AppCompatActivity {
             mAdapter = new SimpleItemRecyclerViewAdapter(this, items);
             StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(20, VERTICAL);
             recyclerView.setLayoutManager(gridLayoutManager);
-            recyclerView.addItemDecoration(new GridDividerItemDecoration(10, getResources().getColor(R.color.gray_666666)));
+            recyclerView.addItemDecoration(new GridDividerItemDecoration(8, Color.WHITE));
             recyclerView.setAdapter(mAdapter);
         }else
             mAdapter.setValues(items);

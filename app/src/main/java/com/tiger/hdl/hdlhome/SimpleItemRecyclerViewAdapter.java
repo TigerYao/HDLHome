@@ -37,20 +37,21 @@ public class SimpleItemRecyclerViewAdapter
     public SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_list_content, parent, false);
-        view.getLayoutParams().height = ((int) Math.floor(DisplayUtil.getScreenHeight(view.getContext()) / (int) Math.ceil(getItemCount() / 20f)) - 7);
-        if(viewType == 1)
-        view.getLayoutParams().width = 20;
-        else if(viewType == 2)
-            view.getLayoutParams().width = 40;
+        view.getLayoutParams().height = ((int) Math.floor((DisplayUtil.getScreenHeight(view.getContext()) - 11) / 11));
+        view.getLayoutParams().width = ((int) Math.floor((DisplayUtil.getScreenWidth(view.getContext()) -20) / 20f));
+        if (viewType == 1)
+            view.getLayoutParams().width /= 2;
+//        else if (viewType == 2)
+//            view.getLayoutParams().width /= 4;
         return new SimpleItemRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
     public int getItemViewType(int position) {
         String value = String.valueOf(position);
-        if (position != 0 && value.contains("4") && !value.contains("7"))
+        if (position != 0 && (value.contains("4") || value.contains("7")))
             return 1;
-        if(position > 0 && (position / 10) % 2 == 1){
+        if (position > 0 && (position / 10) % 2 == 1 && String.valueOf(position - 1).endsWith("9")) {
             return 2;
         }
         return 0;
