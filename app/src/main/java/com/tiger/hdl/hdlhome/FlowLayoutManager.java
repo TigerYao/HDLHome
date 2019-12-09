@@ -137,7 +137,7 @@ public class FlowLayoutManager extends RecyclerView.LayoutManager {
                 top = maxTop;
             }
             if (i > 0 && (i / 10) % 2 == 1 && String.valueOf(i - 1).endsWith("9")) {
-                left += DisplayUtil.dp2px(10, v.getContext());
+                left += DisplayUtil.gap;
             }
             Rect rect = new Rect(left, top, left + w, top + h);
             layoutPoints.put(i, rect);

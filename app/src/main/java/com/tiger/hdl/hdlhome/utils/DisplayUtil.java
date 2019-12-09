@@ -26,6 +26,22 @@ public class DisplayUtil {
     private static int screenWidth = 0;
     private static int screenHeight = 0;
     private static int navigationBarHeight;
+    public static int gap = 0;
+    public static int realWidh = 0;
+    public static int realHeight = 0;
+
+    public static void computeWidth(Context ctx){
+        if(realWidh == 0) {
+            realWidh = ((DisplayUtil.getScreenWidth(ctx)) / 20);
+            Log.i("TAG", "realWidh..."+ realWidh);
+            realWidh = ((DisplayUtil.getScreenWidth(ctx) -  realWidh * 3) / 16);
+            Log.i("TAG", "realWidh..re..."+ realWidh);
+            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(ctx) - 55) / 11));
+            Log.i("TAG", DisplayUtil.getScreenWidth(ctx) + "...realWidh..re..."+ realWidh * 18);
+            gap = Math.abs(DisplayUtil.getScreenWidth(ctx) - realWidh * 18 - 40); //- realWidh * 2;
+            Log.i("TAG","gap..."+gap);
+        }
+    }
 
     public static int getScreenWidth(Context ctx) {
         if (screenWidth <= 0) {

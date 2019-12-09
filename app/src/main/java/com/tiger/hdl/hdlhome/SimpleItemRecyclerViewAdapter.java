@@ -27,6 +27,8 @@ public class SimpleItemRecyclerViewAdapter
         mValues = items;
         mParentActivity = parent;
         realIndex = 0;
+        realWidh = DisplayUtil.realWidh;
+        realHeight = DisplayUtil.realHeight;
     }
 
     public void setValues(List<DummyItem> items) {
@@ -39,11 +41,6 @@ public class SimpleItemRecyclerViewAdapter
     public SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_list_content, parent, false);
-        if(realWidh == 0) {
-            realWidh = (int) Math.floor((DisplayUtil.getScreenWidth(view.getContext())) / 20f);
-            realWidh = (int) Math.floor((DisplayUtil.getScreenWidth(view.getContext()) + realWidh) / 20f);
-            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(view.getContext())) / 11)) - 5;
-        }
         view.getLayoutParams().height = realHeight;
         view.getLayoutParams().width = realWidh;
         if (viewType == 1)
@@ -66,11 +63,8 @@ public class SimpleItemRecyclerViewAdapter
             if (mValues != null && realIndex < mValues.size()) {
                 DummyItem dummyItem = mValues.get(realIndex);
                 realIndex += 1;
-                holder.mContentView.setText(value);
-                int color = dummyItem.status == 2 ? Color.RED
-                        : dummyItem.status == 0 ? Color.GREEN
-                        : dummyItem.status == 3 ? Color.YELLOW
-                        : Color.GRAY;
+                int color = dummyItem.getColor();
+                holder.mContentView.setText(dummyItem.did);
                 holder.itemView.setBackgroundColor(color);
             }
         } else {

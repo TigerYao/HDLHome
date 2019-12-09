@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tiger.hdl.hdlhome.dummy.DeskInfo;
 import com.tiger.hdl.hdlhome.dummy.DummyItem;
+import com.tiger.hdl.hdlhome.utils.DisplayUtil;
 import com.tiger.hdl.hdlhome.utils.FileUtils;
 import com.tiger.hdl.hdlhome.utils.net.SocketClientUtil;
 
@@ -32,8 +33,7 @@ public class LauncherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_list);
         recyclerView = findViewById(R.id.item_list);
-//        DisplayUtil.getMacAddress();
-//        assert recyclerView != null;
+        DisplayUtil.computeWidth(this);
         SocketClientUtil.getInstance().setCtx(this);
         SocketClientUtil.getInstance().openConfig("file:///android_asset/config.txt");
         SocketClientUtil.getInstance().setClientListener(new SocketClientUtil.OnMsgListener() {
@@ -60,7 +60,7 @@ public class LauncherActivity extends AppCompatActivity {
 //            StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(20, VERTICAL);
             FlowLayoutManager flowLayoutManager = new FlowLayoutManager(this, true);
             recyclerView.setLayoutManager(flowLayoutManager);
-            recyclerView.addItemDecoration(new GridDividerItemDecoration(2, Color.WHITE));
+            recyclerView.addItemDecoration(new GridDividerItemDecoration(1, Color.WHITE));
             recyclerView.setAdapter(mAdapter);
         }else
             mAdapter.setValues(items);
