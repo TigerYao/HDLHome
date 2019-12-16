@@ -1,1 +1,1 @@
-{"deskcount":"64","refresh":"5","model":"A","socket":[{"type":"A","ip":"192.168.0.101","port":5555},{"type":"B","ip":"192.168.0.150","port":5555}]}
+{"deskcount":"64","refresh":"5","model":"A","socket":[{"type":"A","ip":"192.168.0.119","port":5555},{"type":"B","ip":"192.168.0.150","port":5555}]}

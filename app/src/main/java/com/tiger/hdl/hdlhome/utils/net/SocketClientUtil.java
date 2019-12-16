@@ -3,6 +3,7 @@ package com.tiger.hdl.hdlhome.utils.net;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -55,11 +57,11 @@ public class SocketClientUtil {
     }
 
     public void openConfig(String configPath) {
-        Log.i(TAG, "openConfig..." + configPath);
+        disConnect();
         Observable.just(configPath).map(new Function<String, ConfigMode>() {
             @Override
             public ConfigMode apply(String s) throws Exception {
-                Log.i(TAG, "apply..." + s);
+                Log.i(TAG, "openConfig..." + Thread.currentThread().getName());
                 ConfigMode configMode = new ConfigMode();
                 String str = null;
                 if (s.contains("android_asset") && s.startsWith("file")) {
@@ -69,13 +71,18 @@ public class SocketClientUtil {
                     str = FileUtils.readTextFile(s);
                     configMode = new Gson().fromJson(str, ConfigMode.class);
                 }
-
                 return configMode;
             }
-        }).map(new Function<ConfigMode, ServiceIpEntity>() {
+        }).observeOn(AndroidSchedulers.mainThread()).onErrorResumeNext(new Function<Throwable, ObservableSource<? extends ConfigMode>>() {
+            @Override
+            public ObservableSource<? extends ConfigMode> apply(Throwable throwable) throws Exception {
+                Toast.makeText(mCtx, "读取文件错误", Toast.LENGTH_LONG).show();
+                return Observable.just(new ConfigMode());
+            }
+        }).subscribeOn(Schedulers.io()).map(new Function<ConfigMode, ServiceIpEntity>() {
             @Override
             public ServiceIpEntity apply(ConfigMode configMode) throws Exception {
-                Log.i(TAG, "ConfigMode..." + configMode.toString());
+                Log.i(TAG, "ConfigMode..." + Thread.currentThread().getName());
                 ServiceIpEntity ipEntity = new ServiceIpEntity();
                 if (configMode.model != null) {
                     ipEntity.type = configMode.model;
@@ -114,7 +121,7 @@ public class SocketClientUtil {
         }
         xTcpClient = XTcpClient.getTcpClient(targetInfo);
         xTcpClient.addTcpClientListener(tcpClientListener);
-        xTcpClient.config(new TcpConnConfig.Builder().setConnTimeout(15 * 1000).setCharsetName("UTF-8").setIsReconnect(true).create());
+        xTcpClient.config(new TcpConnConfig.Builder().setConnTimeout(15 * 1000).setCharsetName("gb2312").setIsReconnect(true).create());
         if (xTcpClient.isDisconnected())
             xTcpClient.connect();
     }

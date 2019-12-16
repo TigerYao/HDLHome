@@ -32,11 +32,11 @@ public class DisplayUtil {
 
     public static void computeWidth(Context ctx){
         if(realWidh == 0) {
-            realWidh = ((DisplayUtil.getScreenWidth(ctx)) / 20);
+            realWidh = (int)((getScreenWidth(ctx) - dp2px(15, ctx))/ 18f);
             Log.i("TAG", "realWidh..."+ realWidh);
-            realWidh = ((DisplayUtil.getScreenWidth(ctx) -  realWidh * 3) / 16);
-            Log.i("TAG", "realWidh..re..."+ realWidh);
-            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(ctx) - 55) / 11));
+//            realWidh = ((DisplayUtil.getScreenWidth(ctx) -  realWidh * 3) / 16);
+//            Log.i("TAG", "realWidh..re..."+ realWidh);
+            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(ctx) - dp2px(25, ctx)) / 11));
             Log.i("TAG", DisplayUtil.getScreenWidth(ctx) + "...realWidh..re..."+ realWidh * 18);
             gap = Math.abs(DisplayUtil.getScreenWidth(ctx) - realWidh * 18 - 40); //- realWidh * 2;
             Log.i("TAG","gap..."+gap);

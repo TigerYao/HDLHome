@@ -1,11 +1,13 @@
 package com.tiger.hdl.hdlhome;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tiger.hdl.hdlhome.dummy.DummyItem;
@@ -59,16 +61,25 @@ public class SimpleItemRecyclerViewAdapter
     @Override
     public void onBindViewHolder(final SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
         String value = String.valueOf(position);
-        if (position != 0 && !value.contains("4") && !value.contains("7")) {
+        if(mValues == null || mValues.size() == 0){
+            holder.itemView.setBackgroundResource(R.color.green);
+        } else if (position != 0 && !value.contains("4") && !value.contains("7")) {
             if (mValues != null && realIndex < mValues.size()) {
                 DummyItem dummyItem = mValues.get(realIndex);
-                realIndex += 1;
-                int color = dummyItem.getColor();
-                holder.mContentView.setText(dummyItem.did);
-                holder.itemView.setBackgroundColor(color);
+                String name = dummyItem.did;
+                holder.mContentView.setTextColor(ContextCompat.getColor(holder.mContentView.getContext(),dummyItem.status == 3? R.color.black : R.color.white));
+                if(((TextUtils.isDigitsOnly(name) && Integer.parseInt(name) > 199) || !TextUtils.isDigitsOnly(name)) && position > 199) {
+                    realIndex += 1;
+                    holder.mContentView.setText(dummyItem.did);
+                    holder.itemView.setBackgroundResource(dummyItem.getColorId());
+                }else if(TextUtils.isDigitsOnly(name) && Integer.parseInt(name) <= 199  && position == Integer.parseInt(name)){
+                    realIndex += 1;
+                    holder.itemView.setBackgroundResource(dummyItem.getColorId());
+                    holder.mContentView.setText(dummyItem.did);
+                }
             }
         } else {
-            holder.itemView.setBackgroundResource(R.color.gray_666666);
+            holder.itemView.setBackgroundResource(R.color.gray_7f7f7f);
         }
     }
 
@@ -78,13 +89,13 @@ public class SimpleItemRecyclerViewAdapter
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        final TextView mIdView;
+//        final TextView mIdView;
         final TextView mContentView;
 
         ViewHolder(View view) {
             super(view);
-            mIdView = (TextView) view.findViewById(R.id.id_text);
-            mContentView = (TextView) view.findViewById(R.id.content);
+//            mIdView = (TextView) view.findViewById(R.id.id_text);
+            mContentView = (TextView) view.findViewById(R.id.id_text);
         }
     }
 }

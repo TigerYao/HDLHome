@@ -6,14 +6,18 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.os.EnvironmentCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tiger.hdl.hdlhome.dummy.DeskInfo;
@@ -35,7 +39,11 @@ public class LauncherActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.item_list);
         DisplayUtil.computeWidth(this);
         SocketClientUtil.getInstance().setCtx(this);
-        SocketClientUtil.getInstance().openConfig("file:///android_asset/config.txt");
+//        SocketClientUtil.getInstance().openConfig(EnvironmentCompat.getStorageState(Environment.getRootDirectory()));
+        String path = Environment.getExternalStorageDirectory().getPath()+"/config.txt";
+        Log.i("LauncherActivity", path);
+        SocketClientUtil.getInstance().openConfig(path);//("file:///android_asset/config.txt");
+        setupRecyclerView(recyclerView, null);
         SocketClientUtil.getInstance().setClientListener(new SocketClientUtil.OnMsgListener() {
             @Override
             public void onReceived(DeskInfo deskInfo) {
@@ -44,7 +52,7 @@ public class LauncherActivity extends AppCompatActivity {
 
             @Override
             public void onConnected() {
-
+                Toast.makeText(getBaseContext(), "连接服务器成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -60,7 +68,7 @@ public class LauncherActivity extends AppCompatActivity {
 //            StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(20, VERTICAL);
             FlowLayoutManager flowLayoutManager = new FlowLayoutManager(this, true);
             recyclerView.setLayoutManager(flowLayoutManager);
-            recyclerView.addItemDecoration(new GridDividerItemDecoration(1, Color.WHITE));
+            recyclerView.addItemDecoration(new GridDividerItemDecoration(1, Color.parseColor("#c3c3c3")));
             recyclerView.setAdapter(mAdapter);
         }else
             mAdapter.setValues(items);
@@ -104,6 +112,7 @@ public class LauncherActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String path = FileUtils.getPath(this, data.getData());
 
+            SocketClientUtil.getInstance().openConfig(path);
         }
     }
 
