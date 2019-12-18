@@ -62,7 +62,7 @@ public class SimpleItemRecyclerViewAdapter
     public void onBindViewHolder(final SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
         String value = String.valueOf(position);
         if(mValues == null || mValues.size() == 0){
-            holder.itemView.setBackgroundResource(R.color.green);
+            holder.mBgView.setBackgroundResource(R.color.green);
         } else if (position != 0 && !value.contains("4") && !value.contains("7")) {
             if (mValues != null && realIndex < mValues.size()) {
                 DummyItem dummyItem = mValues.get(realIndex);
@@ -71,15 +71,15 @@ public class SimpleItemRecyclerViewAdapter
                 if(((TextUtils.isDigitsOnly(name) && Integer.parseInt(name) > 199) || !TextUtils.isDigitsOnly(name)) && position > 199) {
                     realIndex += 1;
                     holder.mContentView.setText(dummyItem.did);
-                    holder.itemView.setBackgroundResource(dummyItem.getColorId());
+                    holder.mBgView.setBackgroundResource(dummyItem.getColorId());
                 }else if(TextUtils.isDigitsOnly(name) && Integer.parseInt(name) <= 199  && position == Integer.parseInt(name)){
                     realIndex += 1;
-                    holder.itemView.setBackgroundResource(dummyItem.getColorId());
+                    holder.mBgView.setBackgroundResource(dummyItem.getColorId());
                     holder.mContentView.setText(dummyItem.did);
                 }
             }
         } else {
-            holder.itemView.setBackgroundResource(R.color.gray_7f7f7f);
+            holder.mBgView.setBackgroundResource(R.color.gray_7f7f7f);
         }
     }
 
@@ -91,11 +91,13 @@ public class SimpleItemRecyclerViewAdapter
     class ViewHolder extends RecyclerView.ViewHolder {
 //        final TextView mIdView;
         final TextView mContentView;
+        final View mBgView;
 
         ViewHolder(View view) {
             super(view);
 //            mIdView = (TextView) view.findViewById(R.id.id_text);
             mContentView = (TextView) view.findViewById(R.id.id_text);
+            mBgView = view.findViewById(R.id.bg);
         }
     }
 }

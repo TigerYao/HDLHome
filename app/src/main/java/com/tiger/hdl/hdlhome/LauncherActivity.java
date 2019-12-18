@@ -68,7 +68,7 @@ public class LauncherActivity extends AppCompatActivity {
 //            StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(20, VERTICAL);
             FlowLayoutManager flowLayoutManager = new FlowLayoutManager(this, true);
             recyclerView.setLayoutManager(flowLayoutManager);
-            recyclerView.addItemDecoration(new GridDividerItemDecoration(1, Color.parseColor("#c3c3c3")));
+//            recyclerView.addItemDecoration(new GridDividerItemDecoration((int)DisplayUtil.dp2px(1, this), Color.parseColor("#c3c3c3")));
             recyclerView.setAdapter(mAdapter);
         }else
             mAdapter.setValues(items);
@@ -111,7 +111,6 @@ public class LauncherActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String path = FileUtils.getPath(this, data.getData());
-
             SocketClientUtil.getInstance().openConfig(path);
         }
     }

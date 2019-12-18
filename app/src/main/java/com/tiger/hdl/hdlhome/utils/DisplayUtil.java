@@ -1,17 +1,9 @@
 package com.tiger.hdl.hdlhome.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -32,14 +24,9 @@ public class DisplayUtil {
 
     public static void computeWidth(Context ctx){
         if(realWidh == 0) {
-            realWidh = (int)((getScreenWidth(ctx) - dp2px(15, ctx))/ 18f);
-            Log.i("TAG", "realWidh..."+ realWidh);
-//            realWidh = ((DisplayUtil.getScreenWidth(ctx) -  realWidh * 3) / 16);
-//            Log.i("TAG", "realWidh..re..."+ realWidh);
-            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(ctx) - dp2px(25, ctx)) / 11));
-            Log.i("TAG", DisplayUtil.getScreenWidth(ctx) + "...realWidh..re..."+ realWidh * 18);
-            gap = Math.abs(DisplayUtil.getScreenWidth(ctx) - realWidh * 18 - 40); //- realWidh * 2;
-            Log.i("TAG","gap..."+gap);
+            realWidh = ((getScreenWidth(ctx) - (int)dp2px(5, ctx))/ 18);
+            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(ctx) - dp2px(30, ctx)) / 11));
+            gap = (getScreenWidth(ctx) - realWidh * 18);
         }
     }
 
