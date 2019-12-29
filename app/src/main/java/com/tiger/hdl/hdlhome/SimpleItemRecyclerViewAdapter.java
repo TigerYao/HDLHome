@@ -61,8 +61,9 @@ public class SimpleItemRecyclerViewAdapter
     @Override
     public void onBindViewHolder(final SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
         String value = String.valueOf(position);
+        holder.mBgView.setBackgroundResource(R.color.gray_7f7f7f);
         if(mValues == null || mValues.size() == 0){
-            holder.mBgView.setBackgroundResource(R.color.green);
+            holder.mBgView.setBackgroundResource(R.color.gray_7f7f7f);
         } else if (position != 0 && !value.contains("4") && !value.contains("7")) {
             if (mValues != null && realIndex < mValues.size()) {
                 DummyItem dummyItem = mValues.get(realIndex);

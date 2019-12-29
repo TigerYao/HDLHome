@@ -40,9 +40,6 @@ public class LauncherActivity extends AppCompatActivity {
         DisplayUtil.computeWidth(this);
         SocketClientUtil.getInstance().setCtx(this);
 //        SocketClientUtil.getInstance().openConfig(EnvironmentCompat.getStorageState(Environment.getRootDirectory()));
-        String path = Environment.getExternalStorageDirectory().getPath()+"/config.txt";
-        Log.i("LauncherActivity", path);
-        SocketClientUtil.getInstance().openConfig(path);//("file:///android_asset/config.txt");
         setupRecyclerView(recyclerView, null);
         SocketClientUtil.getInstance().setClientListener(new SocketClientUtil.OnMsgListener() {
             @Override
@@ -60,6 +57,16 @@ public class LauncherActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!SocketClientUtil.getInstance().isConnectd()) {
+            String path = Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
+            Log.i("LauncherActivity", path);
+            SocketClientUtil.getInstance().openConfig(path);
+        }
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<DummyItem> items) {

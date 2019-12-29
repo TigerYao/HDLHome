@@ -20,6 +20,8 @@ import com.tiger.hdl.hdlhome.utils.net.client.listener.TcpClientListener;
 import com.tiger.hdl.hdlhome.utils.net.client.manager.TcpClientManager;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -54,6 +56,10 @@ public class SocketClientUtil {
 
     public void setClientListener(OnMsgListener clientListener) {
         this.mClientListener = clientListener;
+    }
+
+    public boolean isConnectd(){
+        return xTcpClient!= null && xTcpClient.isConnected();
     }
 
     public void openConfig(String configPath) {
@@ -121,7 +127,7 @@ public class SocketClientUtil {
         }
         xTcpClient = XTcpClient.getTcpClient(targetInfo);
         xTcpClient.addTcpClientListener(tcpClientListener);
-        xTcpClient.config(new TcpConnConfig.Builder().setConnTimeout(15 * 1000).setCharsetName("gb2312").setIsReconnect(true).create());
+        xTcpClient.config(new TcpConnConfig.Builder().setConnTimeout(15 * 1000).setCharsetName("utf-8").setIsReconnect(true).create());
         if (xTcpClient.isDisconnected())
             xTcpClient.connect();
     }
@@ -144,7 +150,7 @@ public class SocketClientUtil {
                         return deskInfo;
                     deskInfo = new Gson().fromJson(strMsg, DeskInfo.class);
                     Log.i(TAG, "deskInfo..." + strMsg);
-
+                    Collections.sort(deskInfo.data);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -16,6 +16,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    signingConfigs {
+        debug {
+            keyAlias 'hdl'
+            keyPassword 'huhu1234'
+            storeFile file('../keys.jks')
+            storePassword 'huhu1234'
+        }
+        release {
+            keyAlias 'hdl'
+            keyPassword 'huhu1234'
+            storeFile file('../keys.jks')
+            storePassword 'huhu1234'
+        }
+    }
 }
 
 dependencies {
