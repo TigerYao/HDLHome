@@ -25,6 +25,7 @@ import com.tiger.hdl.hdlhome.dummy.DummyItem;
 import com.tiger.hdl.hdlhome.utils.DisplayUtil;
 import com.tiger.hdl.hdlhome.utils.FileUtils;
 import com.tiger.hdl.hdlhome.utils.net.SocketClientUtil;
+import com.tiger.hdl.hdlhome.view.LoadingView;
 
 import java.util.List;
 
@@ -33,10 +34,12 @@ public class LauncherActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     SimpleItemRecyclerViewAdapter mAdapter;
     String mConfigPath;
+    LoadingView mLoadingView;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_list);
+        showDialog();
         recyclerView = findViewById(R.id.item_list);
         DisplayUtil.computeWidth(this);
         SocketClientUtil.getInstance().setCtx(this);
@@ -51,10 +54,12 @@ public class LauncherActivity extends AppCompatActivity {
             @Override
             public void onConnected() {
                 Toast.makeText(getBaseContext(), "连接服务器成功", Toast.LENGTH_SHORT).show();
+                hideLoading();
             }
 
             @Override
             public void onDisconnect() {
+                showDialog();
                 SocketClientUtil.getInstance().openConfig(mConfigPath);
             }
         });
@@ -64,7 +69,7 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!SocketClientUtil.getInstance().isConnectd()) {
-            mConfigPath = Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
+            mConfigPath = /*Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
             Log.i("LauncherActivity", mConfigPath);
             SocketClientUtil.getInstance().openConfig(mConfigPath);
         }
@@ -146,6 +151,20 @@ public class LauncherActivity extends AppCompatActivity {
         SocketClientUtil.getInstance().disConnect();
         super.onDestroy();
     }
+
+    public void showLoading(){
+        if (mLoadingView == null) {
+            mLoadingView = new LoadingView(this);
+            mLoadingView.setCanceledOnTouchOutside(false);
+        }
+        mLoadingView.show(); // 显示
+    }
+
+    public void hideLoading(){
+        if(mLoadingView != null && mLoadingView.isShowing())
+            mLoadingView.dismiss();
+    }
+
 
     private boolean checkPermission() {
         int checkSelfPermissionWrite = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
