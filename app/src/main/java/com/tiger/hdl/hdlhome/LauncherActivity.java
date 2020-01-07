@@ -32,6 +32,7 @@ import java.util.List;
 public class LauncherActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     SimpleItemRecyclerViewAdapter mAdapter;
+    String mConfigPath;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +55,7 @@ public class LauncherActivity extends AppCompatActivity {
 
             @Override
             public void onDisconnect() {
-
+                SocketClientUtil.getInstance().openConfig(mConfigPath);
             }
         });
     }
@@ -63,9 +64,9 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!SocketClientUtil.getInstance().isConnectd()) {
-            String path = Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
-            Log.i("LauncherActivity", path);
-            SocketClientUtil.getInstance().openConfig(path);
+            mConfigPath = Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
+            Log.i("LauncherActivity", mConfigPath);
+            SocketClientUtil.getInstance().openConfig(mConfigPath);
         }
     }
 
@@ -117,8 +118,8 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            String path = FileUtils.getPath(this, data.getData());
-            SocketClientUtil.getInstance().openConfig(path);
+            mConfigPath = FileUtils.getPath(this, data.getData());
+            SocketClientUtil.getInstance().openConfig(mConfigPath);
         }
     }
 
