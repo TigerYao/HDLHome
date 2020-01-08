@@ -25,7 +25,7 @@ public class DisplayUtil {
     public static void computeWidth(Context ctx){
         if(realWidh == 0) {
             realWidh = ((getScreenWidth(ctx) - (int)dp2px(5, ctx))/ 18);
-            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(ctx) - dp2px(30, ctx)) / 11));
+            realHeight = ((int) Math.floor((DisplayUtil.getScreenHeight(ctx) - dp2px(80, ctx)) / 11));
             gap = (getScreenWidth(ctx) - realWidh * 18);
         }
     }

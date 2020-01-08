@@ -32,6 +32,8 @@ import java.util.List;
 public class LauncherActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     SimpleItemRecyclerViewAdapter mAdapter;
+    LoadingView mLoadingView;
+    private boolean isBackPressed = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,22 +41,26 @@ public class LauncherActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.item_list);
         DisplayUtil.computeWidth(this);
         SocketClientUtil.getInstance().setCtx(this);
+        showLoading();
 //        SocketClientUtil.getInstance().openConfig(EnvironmentCompat.getStorageState(Environment.getRootDirectory()));
         setupRecyclerView(recyclerView, null);
         SocketClientUtil.getInstance().setClientListener(new SocketClientUtil.OnMsgListener() {
             @Override
             public void onReceived(DeskInfo deskInfo) {
-                setupRecyclerView(recyclerView, deskInfo.data);
+                if(deskInfo != null && deskInfo.data != null && !deskInfo.data.isEmpty())
+                    setupRecyclerView(recyclerView, deskInfo.data);
             }
 
             @Override
             public void onConnected() {
+                hideLoading();
                 Toast.makeText(getBaseContext(), "连接服务器成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onDisconnect() {
-
+                if(!isBackPressed)
+                    showLoading();
             }
         });
     }
@@ -63,10 +69,16 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!SocketClientUtil.getInstance().isConnectd()) {
-            String path = Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
+            String path = /*Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
             Log.i("LauncherActivity", path);
             SocketClientUtil.getInstance().openConfig(path);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SocketClientUtil.getInstance().disConnect();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<DummyItem> items) {
@@ -77,13 +89,15 @@ public class LauncherActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(flowLayoutManager);
 //            recyclerView.addItemDecoration(new GridDividerItemDecoration((int)DisplayUtil.dp2px(1, this), Color.parseColor("#c3c3c3")));
             recyclerView.setAdapter(mAdapter);
-        }else
+        }else if(items != null && !items.isEmpty())
             mAdapter.setValues(items);
     }
 
 
     @Override
     public void onBackPressed() {
+        isBackPressed = true;
+        hideLoading();
         showDialog();
     }
 
@@ -109,6 +123,12 @@ public class LauncherActivity extends AppCompatActivity {
                             break;
                     }
                 }
+            }).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+                    isBackPressed = false;
+                    showLoading();
+                }
             }).setTitle("设置").create();
         mSettingDialog.show();
     }
@@ -117,6 +137,7 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
+            showLoading();
             String path = FileUtils.getPath(this, data.getData());
             SocketClientUtil.getInstance().openConfig(path);
         }
@@ -145,7 +166,18 @@ public class LauncherActivity extends AppCompatActivity {
         SocketClientUtil.getInstance().disConnect();
         super.onDestroy();
     }
+    public void showLoading(){
+        if (mLoadingView == null) {
+            mLoadingView = new LoadingView(this);
+            mLoadingView.setCanceledOnTouchOutside(false);
+        }
+        if(!mLoadingView.isShowing()) mLoadingView.show(); // 显示
+    }
 
+    public void hideLoading(){
+        if(mLoadingView != null && mLoadingView.isShowing())
+            mLoadingView.dismiss();
+    }
     private boolean checkPermission() {
         int checkSelfPermissionWrite = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (checkSelfPermissionWrite == PackageManager.PERMISSION_GRANTED) {

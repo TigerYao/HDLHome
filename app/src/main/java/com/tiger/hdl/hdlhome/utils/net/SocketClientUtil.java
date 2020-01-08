@@ -19,14 +19,13 @@ import com.tiger.hdl.hdlhome.utils.net.client.bean.TcpMsg;
 import com.tiger.hdl.hdlhome.utils.net.client.listener.TcpClientListener;
 import com.tiger.hdl.hdlhome.utils.net.client.manager.TcpClientManager;
 
-import java.io.File;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
@@ -40,7 +39,7 @@ public class SocketClientUtil {
     private Context mCtx;
     private int refreshTime = 5;
     private OnMsgListener mClientListener;
-
+    Disposable mConnectObservable, mParseObser, mOpenObser, mReceiverObser;
     public static SocketClientUtil getInstance() {
         if (mInstance == null)
             mInstance = new SocketClientUtil();
@@ -64,7 +63,7 @@ public class SocketClientUtil {
 
     public void openConfig(String configPath) {
         disConnect();
-        Observable.just(configPath).map(new Function<String, ConfigMode>() {
+        mOpenObser = Observable.just(configPath).map(new Function<String, ConfigMode>() {
             @Override
             public ConfigMode apply(String s) throws Exception {
                 Log.i(TAG, "openConfig..." + Thread.currentThread().getName());
@@ -117,6 +116,18 @@ public class SocketClientUtil {
             xTcpClient.disconnect();
             xTcpClient = null;
         }
+        if(mConnectObservable != null && !mConnectObservable.isDisposed())
+            mConnectObservable.dispose();
+        if(mReceiverObser != null && !mReceiverObser.isDisposed())
+            mReceiverObser.dispose();
+        if(mParseObser != null && !mParseObser.isDisposed())
+            mParseObser.dispose();
+        if(mOpenObser != null && !mOpenObser.isDisposed())
+            mOpenObser.dispose();
+        mConnectObservable = null;
+        mReceiverObser = null;
+        mParseObser = null;
+        mOpenObser = null;
     }
 
     private void connetct(String ip, int port) {
@@ -141,7 +152,7 @@ public class SocketClientUtil {
     }
 
     private void pareseMsg(final String strMsg) {
-        Observable.just(strMsg).map(new Function<String, DeskInfo>() {
+       mParseObser = Observable.just(strMsg).map(new Function<String, DeskInfo>() {
             @Override
             public DeskInfo apply(String stringBuilder) throws Exception {
                 DeskInfo deskInfo = new DeskInfo();
@@ -170,8 +181,10 @@ public class SocketClientUtil {
         @Override
         public void onConnected(final XTcpClient client) {
             Log.i(TAG, "onConnected...");
+            if(mConnectObservable != null && !mConnectObservable.isDisposed())
+                mConnectObservable.dispose();
             client.sendMsg(getSendMsg());
-            Observable.interval(refreshTime, TimeUnit.SECONDS).filter(new Predicate<Long>() {
+            mConnectObservable = Observable.interval(refreshTime, TimeUnit.SECONDS).filter(new Predicate<Long>() {
                 @Override
                 public boolean test(Long aLong) throws Exception {
                     return xTcpClient != null && xTcpClient.isConnected();
@@ -201,7 +214,9 @@ public class SocketClientUtil {
 
         @Override
         public void onReceive(XTcpClient client, TcpMsg tcpMsg) {
-            Observable.just(tcpMsg).filter(new Predicate<TcpMsg>() {
+            if(mReceiverObser != null && !mReceiverObser.isDisposed())
+                mReceiverObser.dispose();
+            mReceiverObser = Observable.just(tcpMsg).filter(new Predicate<TcpMsg>() {
                 @Override
                 public boolean test(TcpMsg tcpMsg) throws Exception {
                     return (tcpMsg != null && !TextUtils.isEmpty(tcpMsg.getSourceDataString()));
