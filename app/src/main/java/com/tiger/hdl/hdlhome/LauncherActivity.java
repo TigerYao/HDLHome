@@ -34,6 +34,7 @@ public class LauncherActivity extends AppCompatActivity {
     SimpleItemRecyclerViewAdapter mAdapter;
     LoadingView mLoadingView;
     private boolean isBackPressed = false;
+    private boolean isSelected = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +69,7 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(!SocketClientUtil.getInstance().isConnectd()) {
+        if(!SocketClientUtil.getInstance().isConnectd() && !isSelected) {
             String path = /*Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
             Log.i("LauncherActivity", path);
             SocketClientUtil.getInstance().openConfig(path);
@@ -115,6 +116,7 @@ public class LauncherActivity extends AppCompatActivity {
                                 intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
                                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                                 startActivityForResult(intent, 1);
+                                isSelected = true;
                             }
                             break;
                         case 1:
@@ -141,6 +143,7 @@ public class LauncherActivity extends AppCompatActivity {
             String path = FileUtils.getPath(this, data.getData());
             SocketClientUtil.getInstance().openConfig(path);
         }
+            isSelected = false;
     }
 
     @Override
@@ -152,8 +155,10 @@ public class LauncherActivity extends AppCompatActivity {
                 intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(intent, 1);
+                isSelected = true;
             }
-        }
+        }else
+            isSelected = false;
     }
 
     @Override

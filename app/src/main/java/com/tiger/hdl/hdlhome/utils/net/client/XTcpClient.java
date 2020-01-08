@@ -204,12 +204,13 @@ public class XTcpClient extends BaseXSocket {
                 }
                 getSocket().connect(new InetSocketAddress(mTargetInfo.getIp(), mTargetInfo.getPort()),
                         (int) mTcpConnConfig.getConnTimeout());
+                i = 1;
                 XSocketLog.d(TAG, "创建连接成功,target=" + mTargetInfo + ",localport=" + localPort);
             }catch (Exception e) {
                 i++;
                 XSocketLog.d(TAG, "创建连接失败,target=" + mTargetInfo + "," + e);
                 try{
-                    sleep(5000 * i);
+                    sleep(2000 * i);
                     if(i > 10)
                         i = 1;
                 }catch (Exception es){}
