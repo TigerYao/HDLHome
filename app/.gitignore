@@ -1,7 +1,7 @@
 # Built application 文件
 *.apk
 *.ap_
-
+release/
 # ART/Dalvik VM 文件
 *.dex
 
