@@ -188,7 +188,7 @@ public class XTcpClient extends BaseXSocket {
         getReceiveThread().start();
     }
 
-    int i = 1;
+    int i = 0;
     /**
      * tcp连接线程
      */
@@ -204,17 +204,18 @@ public class XTcpClient extends BaseXSocket {
                 }
                 getSocket().connect(new InetSocketAddress(mTargetInfo.getIp(), mTargetInfo.getPort()),
                         (int) mTcpConnConfig.getConnTimeout());
-                i = 1;
+                i = 0;
                 XSocketLog.d(TAG, "创建连接成功,target=" + mTargetInfo + ",localport=" + localPort);
             }catch (Exception e) {
-                i++;
                 XSocketLog.d(TAG, "创建连接失败,target=" + mTargetInfo + "," + e);
+                if(i > 0)
                 try{
                     sleep(2000 * i);
                     if(i > 10)
-                        i = 1;
+                        i = 0;
                 }catch (Exception es){}
                 onErrorDisConnect("创建连接失败", e);
+                i++;
                 return;
             }
             notifyConnected();

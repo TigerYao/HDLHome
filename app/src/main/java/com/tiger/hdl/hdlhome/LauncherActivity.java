@@ -70,7 +70,7 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!SocketClientUtil.getInstance().isConnectd() && !isSelected) {
-            String path = /*Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
+            String path = Environment.getExternalStorageDirectory().getPath()+"/config.txt";//*/("file:///android_asset/config.txt");
             Log.i("LauncherActivity", path);
             SocketClientUtil.getInstance().openConfig(path);
         }
@@ -172,6 +172,8 @@ public class LauncherActivity extends AppCompatActivity {
         super.onDestroy();
     }
     public void showLoading(){
+        if(SocketClientUtil.getInstance().isConnectd())
+            return;
         if (mLoadingView == null) {
             mLoadingView = new LoadingView(this);
             mLoadingView.setCanceledOnTouchOutside(false);

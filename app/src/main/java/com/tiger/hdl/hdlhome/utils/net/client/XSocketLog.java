@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class XSocketLog {
 
-    public static boolean debug = false;
+    public static boolean debug = true;
     public static final String TAG = "XSocket";
 
     public static void debug(boolean debug1) {
