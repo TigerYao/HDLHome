@@ -64,6 +64,14 @@ public class LauncherActivity extends AppCompatActivity {
                     showLoading();
             }
         });
+        try {
+            Intent intent = new Intent();
+            intent.setClassName("com.huatu.tiger.hdlupdateapp", "com.huatu.tiger.hdlupdateapp.MainActivity");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }catch (Exception e){
+
+        }
     }
 
     @Override
